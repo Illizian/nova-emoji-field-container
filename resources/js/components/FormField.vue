@@ -87,7 +87,7 @@
             Picker,
         },
 
-        data: () => ({ open: false, height: 0 }),
+        data: () => ({ open: false, height: 0, cursor: false }),
 
         props: [
             'field',
@@ -137,11 +137,21 @@
                 this.field.fields[this.open].fill(data);
                 let value = data.get(this.field.fields[this.open].attribute);
 
-                // 2. Add the selected Emoji to it
-                value += emoji.native;
+                // 2. Detect text cursor and/or input location
+                let textarea = this.$refs.field[this.open].querySelector('textarea');
+                // The cursor for input is either:
+                // - the current cursor
+                // - the postion in the text area
+                // - the end of the current value
+                this.cursor = this.cursor || textarea.selectionEnd || value.length;
 
-                // 3. Update the value
-                Nova.$emit(this.field.fields[this.open].attribute + "-value", value);
+                // 3. Add the selected Emoji to it
+                let update = value.split('');
+                update.splice(this.cursor, 0, emoji.native);
+                this.cursor += emoji.native.length;
+
+                // 4. Update the value
+                Nova.$emit(this.field.fields[this.open].attribute + "-value", update.join(''));
             },
             windowClick(event) {
                 if(
@@ -149,7 +159,8 @@
                     ! this.$refs.picker.$el.contains(event.target) &&
                     this.open !== false
                 ) {
-                    return this.open = false;
+                    this.open = false;
+                    this.cursor = false;
                 }
             },
         },
