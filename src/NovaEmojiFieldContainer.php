@@ -3,6 +3,7 @@
 namespace Illizian\NovaEmojiFieldContainer;
 
 use Laravel\Nova\Fields\Field;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class NovaEmojiFieldContainer extends Field
 {
